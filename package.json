@@ -1,0 +1,72 @@
+{
+    "name": "react-surfer-slider",
+    "version": "0.0.0",
+    "main": "./dist/ReactSurferSlider.js",
+    "types": "./dist/ReactSurferSlider.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "webpack-dev-server --content-base src --inline --config webpack.config.dev.js",
+        "prod": "node ./node_modules/webpack/bin/webpack.js -p --progress --config ./webpack.config.prod.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/martyan/react-surfer-slider.git"
+    },
+    "description": "Cool animated photo / article slider",
+    "keywords": [
+        "react",
+        "slider",
+        "surfer",
+        "component",
+        "animation",
+        "slideshow",
+        "gallery"
+    ],
+    "homepage": "https://martinjuzl.com/react-surfer-slider",
+    "author": "Martin Juzl",
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.12.3",
+        "@babel/plugin-proposal-class-properties": "^7.12.1",
+        "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+        "@babel/polyfill": "^7.12.1",
+        "@babel/preset-env": "^7.12.1",
+        "@babel/preset-react": "^7.12.1",
+        "@types/react": "^16.9.55",
+        "@types/react-dom": "^16.9.9",
+        "@types/react-hot-loader": "^3.0.0",
+        "@types/webpack-env": "^1.15.3",
+        "autoprefixer": "^9.8.6",
+        "awesome-typescript-loader": "^5.2.1",
+        "babel-eslint": "^9.0.0",
+        "babel-loader": "^8.1.0",
+        "babel-plugin-react-css-modules": "^3.4.2",
+        "clean-webpack-plugin": "^0.1.19",
+        "css-loader": "^1.0.0",
+        "eslint": "^5.16.0",
+        "eslint-loader": "^2.2.1",
+        "eslint-plugin-react": "^7.21.5",
+        "html-webpack-plugin": "^3.2.0",
+        "moment": "^2.29.1",
+        "node-sass": "^4.14.1",
+        "postcss-loader": "^3.0.0",
+        "postcss-scss": "^2.1.1",
+        "prop-types": "^15.7.2",
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
+        "react-hot-loader": "^3.0.0-beta.7",
+        "sass-loader": "^7.3.1",
+        "style-loader": "^0.23.0",
+        "terser-webpack-plugin": "^3.1.0",
+        "typescript": "^4.0.5",
+        "webpack": "^4.44.2",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-middleware": "^3.7.2",
+        "webpack-dev-server": "^3.11.0"
+    },
+    "peerDependencies": {
+        "react": "^0.14.0 || ^15.0.0 || ^16.0.0"
+    }
+}
