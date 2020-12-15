@@ -1,7 +1,6 @@
 import React, {FunctionComponent, ReactNode, useEffect, useState, useRef} from 'react'
 import './SurferSlider.scss'
-import classNames from "./classNames";
-import Timer from "./Timer";
+import classNames from './classNames';
 
 export type ReactSurferSliderProps = {
     items: { title: string, img: string }[]
@@ -23,35 +22,51 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items })
     const [lines, setLines] = useState<string[]>([])
     const [timer, setTimer] = useState(0)
     const [isAnimating, setIsAnimating] = useState(false)
+    const [timeoutId, setTimeoutId] = useState<number | undefined>()
+    const [mouseOver, setMouseOver] = useState(false)
 
     const activeItem = items[activeItemIndex]
 
     useEffect(() => {
-
         if(sliderRef !== null) {
-            const sliderWidth = sliderRef.current!.offsetWidth
-            console.log(sliderWidth)
-
-            const wWidth = getTextWidth('w', "normal 14px 'Roboto Slab'")
-            console.log(wWidth)
-
-            const charsOnLine = Math.floor(sliderWidth / wWidth)
+            // const sliderWidth = sliderRef.current!.offsetWidth
+            // const wWidth = getTextWidth('w', "normal 14px 'Roboto Slab'")
+            // const charsOnLine = Math.floor(sliderWidth / wWidth)
             // const regex = new RegExp('(?:^|\\b)[\\w .\\/]{1,' + charsOnLine + '}(?:\\b|$)', 'gi')
             const lines = activeItem.title.match(/(?:^|\b)[\w .\/]{1,36}(?:\b|$)/gi)
             setLines(lines || [])
         }
+
+        initTimeout()
     }, [activeItemIndex])
 
-    useEffect(() => {
-        if(timer !== 0 && timer % 5 === 0) {
+    const resetTimeout = () => {
+        if(timeoutId) {
+            window.clearTimeout(timeoutId)
+            setTimeoutId(undefined)
+        }
+    }
+
+    const initTimeout = (forcedActiveItemIndex?: number) => {
+        resetTimeout()
+
+        const timeout = setTimeout(() => {
             setIsAnimating(true)
 
             setTimeout(() => {
                 setIsAnimating(false)
-                setActiveItemIndex(activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1)
+                setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1))
             }, 1000)
-        }
-    }, [timer])
+        }, forcedActiveItemIndex !== undefined ? 0 : 5000)
+
+        setTimeoutId(timeout)
+    }
+
+    const handlePaginationItemClick = (e: MouseEvent, i: number) => {
+        e.stopPropagation()
+
+        initTimeout(i)
+    }
 
     const getNextItem = (activeItemIndex: number) => items[activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1]
     const nextItem = getNextItem(activeItemIndex)
@@ -59,18 +74,23 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items })
     return (
         <>
             <div
-                className={classNames(['surfer-slider', isAnimating && 'surfer-slider--before-show'])}
+                className={classNames(['surfer-slider', isAnimating && 'surfer-slider--before-show', mouseOver && 'surfer-slider--mouse-over'])}
                 ref={sliderRef}
+                onMouseEnter={() => {
+                    resetTimeout()
+                    setMouseOver(true)
+                }}
+                onMouseLeave={() => {
+                    initTimeout()
+                    setMouseOver(false)
+                }}
             >
                 <div className="surfer-slider__pagination">
                     {items.map((item, i) => (
                         <div
                             key={i}
                             className={classNames(['surfer-slider__pagination-item', activeItemIndex === i && 'surfer-slider__pagination-item--active'])}
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                setActiveItemIndex(i)
-                            }}
+                            onClick={(e) => handlePaginationItemClick(e, i)}
                         >
                             <span></span>
                         </div>
@@ -90,7 +110,6 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items })
                     ))}
                 </div>
             </div>
-            {/*<Timer onChange={setTimer} />*/}
             {/*<div className="preview">w</div>*/}
             {/*<canvas ref={canvasRef}></canvas>*/}
         </>
