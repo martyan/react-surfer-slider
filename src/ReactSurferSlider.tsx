@@ -2,11 +2,18 @@ import React, {FunctionComponent, ReactNode, useEffect, useState, useRef} from '
 import './SurferSlider.scss'
 import classNames from './classNames';
 
+export type ReactSurferSliderItemProps = {
+    title: string,
+    img: string,
+    url: string
+}
+
 export type ReactSurferSliderProps = {
-    items: { title: string, img: string }[],
+    items: Array<ReactSurferSliderItemProps>,
     fontFamily: string,
-    fontSizes: { minWidth: number, fontSize: number }[]
-    captionWidths: { minWidth: number, captionWidth: number }[]
+    fontSizes: { minWidth: number, fontSize: number }[],
+    captionWidths: { minWidth: number, captionWidth: number }[],
+    onClick?: (item: ReactSurferSliderItemProps) => void
 }
 
 function getTextWidth(text: string, fontFamily: string): number {
@@ -18,7 +25,7 @@ function getTextWidth(text: string, fontFamily: string): number {
     return Math.ceil(metrics.width)
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, fontFamily, fontSizes, captionWidths }) => {
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, fontFamily, fontSizes, captionWidths, onClick }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
     const [activeItemIndex, setActiveItemIndex] = useState(0)
@@ -125,6 +132,9 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
             onMouseLeave={() => {
                 initTimeout(undefined, timeoutElapsed)
                 setMouseOver(false)
+            }}
+            onClick={() => {
+                onClick?.(activeItem)
             }}
         >
             <div className="surfer-slider__pagination">
