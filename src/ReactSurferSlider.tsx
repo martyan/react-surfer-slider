@@ -113,49 +113,45 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
     const nextItem = getNextItem(activeItemIndex)
 
     return (
-        <>
-            <div
-                className={classNames(['surfer-slider', isAnimating && 'surfer-slider--before-show', mouseOver && 'surfer-slider--mouse-over'])}
-                ref={sliderRef}
-                onMouseEnter={() => {
-                    resetTimeout()
-                    const deltaTime = new Date().getTime() - timeoutTimeStamp
-                    setTimeoutElapsed(timeoutElapsed + deltaTime)
-                    setMouseOver(true)
-                }}
-                onMouseLeave={() => {
-                    initTimeout(undefined, timeoutElapsed)
-                    setMouseOver(false)
-                }}
-            >
-                <div className="surfer-slider__pagination">
-                    {items.map((item, i) => (
-                        <div
-                            key={i}
-                            className={classNames(['surfer-slider__pagination-item', activeItemIndex === i && 'surfer-slider__pagination-item--active'])}
-                            onClick={(e) => handlePaginationItemClick(e, i)}
-                        >
-                            <span></span>
-                        </div>
-                    ))}
-                </div>
-                <div className="surfer-slider__img">
-                    <img src={activeItem.img} alt={activeItem.title} />
-                </div>
-                <div className="surfer-slider__img surfer-slider__img--next">
-                    <img src={nextItem.img} alt={nextItem.title} />
-                </div>
-                <div className="surfer-slider__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
-                    {lines.map((line, i) => (
-                        <div key={i}>
-                            <span>{line}</span>
-                        </div>
-                    ))}
-                </div>
+        <div
+            className={classNames(['surfer-slider', isAnimating && 'surfer-slider--before-show', mouseOver && 'surfer-slider--mouse-over'])}
+            ref={sliderRef}
+            onMouseEnter={() => {
+                resetTimeout()
+                const deltaTime = new Date().getTime() - timeoutTimeStamp
+                setTimeoutElapsed(timeoutElapsed + deltaTime)
+                setMouseOver(true)
+            }}
+            onMouseLeave={() => {
+                initTimeout(undefined, timeoutElapsed)
+                setMouseOver(false)
+            }}
+        >
+            <div className="surfer-slider__pagination">
+                {items.map((item, i) => (
+                    <div
+                        key={i}
+                        className={classNames(['surfer-slider__pagination-item', activeItemIndex === i && 'surfer-slider__pagination-item--active'])}
+                        onClick={(e) => handlePaginationItemClick(e, i)}
+                    >
+                        <span></span>
+                    </div>
+                ))}
             </div>
-            {/*<div className="preview">w</div>*/}
-            {/*<canvas ref={canvasRef}></canvas>*/}
-        </>
+            <div className="surfer-slider__img">
+                <img src={activeItem.img} alt={activeItem.title} />
+            </div>
+            <div className="surfer-slider__img surfer-slider__img--next">
+                <img src={nextItem.img} alt={nextItem.title} />
+            </div>
+            <div className="surfer-slider__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
+                {lines.map((line, i) => (
+                    <div key={i}>
+                        <span>{line}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
     )
 
 }

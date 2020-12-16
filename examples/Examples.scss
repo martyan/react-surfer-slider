@@ -3,8 +3,12 @@
 @import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
 .examples {
+  font-family: 'Roboto Slab', sans-serif;
+}
 
-    font-family: 'Roboto Slab', sans-serif;
-
+.container {
+  width: 100%;
+  max-width: 560px;
+  //margin: 0 auto 100px;
 }
 
