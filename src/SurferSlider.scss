@@ -33,7 +33,6 @@
 .surfer-slider {
   position: relative;
   width: 100%;
-  max-width: 480px;
 
   &.surfer-slider--mouse-over {
     .surfer-slider__pagination-item--active span:after {
@@ -47,7 +46,7 @@
   &.surfer-slider--before-show {
     .surfer-slider__img:not(.surfer-slider__img--next) img {
       right: 120%;
-      transition: 1.2s ease;
+      transition: 1s ease;
       animation: none;
       transform: scale(1);
     }
@@ -56,18 +55,20 @@
       background: #333;
     }
 
+    .surfer-slider__img--next {
+      &:after {
+        right: 120%;
+        transition: 1.2s ease;
+      }
+    }
+
     .surfer-slider__title {
       span {
         color: transparent;
         max-width: 1px;
         max-height: 4px;
+        transition: 1s cubic-bezier(.4,.55,.56,.4), color .15s ease;
       }
-    }
-  }
-
-  &:hover {
-    .surfer-slider__img img, .surfer-slider__pagination-item--active span:after {
-      //animation-play-state: paused;
     }
   }
 }
@@ -98,7 +99,7 @@
     span {
       opacity: .7;
       &:after {
-        animation: progress 5s forwards linear;
+        animation: progress 6s forwards linear;
       }
     }
   }
@@ -127,6 +128,17 @@
   padding-top: calc(100% / 16 * 9);
   overflow: hidden;
   z-index: 9;
+
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, white 100%);
+    opacity: .3;
+  }
 
   &.surfer-slider__img--next {
     position: absolute;
@@ -165,13 +177,21 @@
   right: 15px;
   z-index: 19;
 
-  font-family: 'Merriweather', serif;
-  font-size: 18px;
+  //font-family: 'Merriweather', serif;
+  //font-size: 18px;
   font-weight: normal;
 
   div {
     display: flex;
     align-items: center;
+
+    &:first-child span {
+      padding-top: 7px;
+    }
+
+    &:last-child span {
+      padding-bottom: 7px;
+    }
   }
 
   span {
@@ -180,10 +200,14 @@
     max-width: 100%;
     max-height: 100px;
     transition: 1s cubic-bezier(.4,.55,.56,.4), color .15s ease .3s;
-    padding: 4px 7px;
+    padding: 3px 8px;
     background: black;
     color: white;
     white-space: nowrap;
+
+    @media (min-width: 640px) {
+      padding: 4px 10px;
+    }
   }
 
 }

@@ -3,38 +3,75 @@ import './SurferSlider.scss'
 import classNames from './classNames';
 
 export type ReactSurferSliderProps = {
-    items: { title: string, img: string }[]
+    items: { title: string, img: string }[],
+    fontFamily: string,
+    fontSizes: { minWidth: number, fontSize: number }[]
+    captionWidths: { minWidth: number, captionWidth: number }[]
 }
 
-function getTextWidth(text: string, font: string): number {
+function getTextWidth(text: string, fontFamily: string): number {
     // re-use canvas object for better performance
-    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'))
-    var context = canvas.getContext('2d')
-    context.font = font
-    var metrics = context.measureText(text)
-    return metrics.width
+    let canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'))
+    let context = canvas.getContext('2d')
+    context.font = fontFamily
+    let metrics = context.measureText(text)
+    return Math.ceil(metrics.width)
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items }) => {
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, fontFamily, fontSizes, captionWidths }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
     const [activeItemIndex, setActiveItemIndex] = useState(0)
     const [lines, setLines] = useState<string[]>([])
-    const [timer, setTimer] = useState(0)
     const [isAnimating, setIsAnimating] = useState(false)
     const [timeoutId, setTimeoutId] = useState<number | undefined>()
     const [mouseOver, setMouseOver] = useState(false)
 
     const activeItem = items[activeItemIndex]
 
+    const getCurrentCaptionWidth = () => {
+        if(sliderRef.current === null) return captionWidths[0].captionWidth
+        const sliderWidth = sliderRef.current!.offsetWidth
+        const current = [...captionWidths].reverse().find(size => size.minWidth < sliderWidth)
+        return current ? current.captionWidth : captionWidths[0].captionWidth
+    }
+
+    const getCurrentFontSize = () => {
+        if(sliderRef.current === null) return fontSizes[0].fontSize
+        const sliderWidth = sliderRef.current!.offsetWidth
+        const current = [...fontSizes].reverse().find(size => size.minWidth < sliderWidth)
+        return current ? current.fontSize : fontSizes[0].fontSize
+    }
+
+    const getLines = (activeItemIndex: number, maxWidth: number) => {
+        const activeItem = items[activeItemIndex]
+
+        let lines = []
+        let words = activeItem.title.split(' ')
+        while(words.length !== 0) {
+            let lineWidth = 0
+            let wordCount = 0
+            while(lineWidth < maxWidth) {
+                if(wordCount + 1 > words.length) break
+                const part = words.slice(0, wordCount + 1).join(' ')
+                lineWidth = getTextWidth(part, `normal ${getCurrentFontSize()}px '${fontFamily}'`)
+                if(lineWidth > maxWidth) break
+                wordCount++
+                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, `normal ${getCurrentFontSize()}px '${fontFamily}'`)
+            }
+            lines.push(words.slice(0, wordCount).join(' '))
+            words = words.slice(wordCount)
+        }
+
+        return lines
+    }
+
     useEffect(() => {
         if(sliderRef !== null) {
-            // const sliderWidth = sliderRef.current!.offsetWidth
-            // const wWidth = getTextWidth('w', "normal 14px 'Roboto Slab'")
-            // const charsOnLine = Math.floor(sliderWidth / wWidth)
-            // const regex = new RegExp('(?:^|\\b)[\\w .\\/]{1,' + charsOnLine + '}(?:\\b|$)', 'gi')
-            const lines = activeItem.title.match(/(?:^|\b)[\w .\/]{1,36}(?:\b|$)/gi)
-            setLines(lines || [])
+            const sliderWidth = sliderRef.current!.offsetWidth
+            const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
+            const lines = getLines(activeItemIndex, maxWidth)
+            setLines(lines)
         }
 
         initTimeout()
@@ -102,7 +139,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items })
                 <div className="surfer-slider__img surfer-slider__img--next">
                     <img src={nextItem.img} alt={nextItem.title} />
                 </div>
-                <div className="surfer-slider__title">
+                <div className="surfer-slider__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
                     {lines.map((line, i) => (
                         <div key={i}>
                             <span>{line}</span>
