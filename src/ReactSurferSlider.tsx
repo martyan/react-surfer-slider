@@ -24,8 +24,10 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
     const [activeItemIndex, setActiveItemIndex] = useState(0)
     const [lines, setLines] = useState<string[]>([])
     const [isAnimating, setIsAnimating] = useState(false)
-    const [timeoutId, setTimeoutId] = useState<number | undefined>()
     const [mouseOver, setMouseOver] = useState(false)
+    const [timeoutId, setTimeoutId] = useState<number | undefined>()
+    const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
+    const [timeoutElapsed, setTimeoutElapsed] = useState(0)
 
     const activeItem = items[activeItemIndex]
 
@@ -72,6 +74,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
             const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
             const lines = getLines(activeItemIndex, maxWidth)
             setLines(lines)
+            setTimeoutElapsed(0)
         }
 
         initTimeout()
@@ -84,8 +87,10 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
         }
     }
 
-    const initTimeout = (forcedActiveItemIndex?: number) => {
+    const initTimeout = (forcedActiveItemIndex?: number, elapsedTime: number = 0) => {
         resetTimeout()
+
+        setTimeoutTimestamp(new Date().getTime())
 
         const timeout = setTimeout(() => {
             setIsAnimating(true)
@@ -94,8 +99,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
                 setIsAnimating(false)
                 setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1))
             }, 1000)
-        }, forcedActiveItemIndex !== undefined ? 0 : 5000)
-
+        }, forcedActiveItemIndex !== undefined ? 0 : 5000 - elapsedTime)
         setTimeoutId(timeout)
     }
 
@@ -115,10 +119,12 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
                 ref={sliderRef}
                 onMouseEnter={() => {
                     resetTimeout()
+                    const deltaTime = new Date().getTime() - timeoutTimeStamp
+                    setTimeoutElapsed(timeoutElapsed + deltaTime)
                     setMouseOver(true)
                 }}
                 onMouseLeave={() => {
-                    initTimeout()
+                    initTimeout(undefined, timeoutElapsed)
                     setMouseOver(false)
                 }}
             >
