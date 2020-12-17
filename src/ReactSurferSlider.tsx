@@ -101,10 +101,10 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
 
         setTimeoutTimestamp(new Date().getTime())
 
-        const timeout = setTimeout(() => {
+        const timeout = window.setTimeout(() => {
             setIsAnimating(true)
 
-            setTimeout(() => {
+            window.setTimeout(() => {
                 setIsAnimating(false)
                 setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1))
             }, 1000)
