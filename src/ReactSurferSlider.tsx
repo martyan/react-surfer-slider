@@ -9,8 +9,6 @@ export type ReactSurferSliderItemProps = {
 
 export type ReactSurferSliderProps = {
     items: Array<ReactSurferSliderItemProps>,
-    fontFamily: string,
-    fontSizes: { minWidth: number, fontSize: number }[],
     captionWidths: { minWidth: number, captionWidth: number }[],
     onClick?: (item: ReactSurferSliderItemProps) => void
 }
@@ -27,9 +25,10 @@ function getTextWidth(text: string, fontFamily: string): number {
     return Math.ceil(metrics.width)
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, fontFamily, fontSizes, captionWidths, onClick }) => {
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, captionWidths, onClick }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
+    const titleRef = useRef<HTMLDivElement>(null)
     const [activeItemIndex, setActiveItemIndex] = useState(0)
     const [lines, setLines] = useState<string[]>([])
     const [isAnimating, setIsAnimating] = useState(false)
@@ -38,6 +37,10 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
     const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
     const [timeoutElapsed, setTimeoutElapsed] = useState(0)
 
+    const [fontFamily, setFontFamily] = useState('Arial')
+    const [fontSize, setFontSize] = useState('16px')
+    const [fontStyle, setFontStyle] = useState('normal')
+
     const activeItem = items[activeItemIndex]
 
     const getCurrentCaptionWidth = () => {
@@ -45,13 +48,6 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
         const sliderWidth = sliderRef.current!.offsetWidth
         const current = [...captionWidths].reverse().find(size => size.minWidth < sliderWidth)
         return current ? current.captionWidth : captionWidths[0].captionWidth
-    }
-
-    const getCurrentFontSize = () => {
-        if(sliderRef.current === null) return fontSizes[0].fontSize
-        const sliderWidth = sliderRef.current!.offsetWidth
-        const current = [...fontSizes].reverse().find(size => size.minWidth < sliderWidth)
-        return current ? current.fontSize : fontSizes[0].fontSize
     }
 
     const getLines = (activeItemIndex: number, maxWidth: number) => {
@@ -65,10 +61,10 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
             while(lineWidth < maxWidth) {
                 if(wordCount + 1 > words.length) break
                 const part = words.slice(0, wordCount + 1).join(' ')
-                lineWidth = getTextWidth(part, `normal ${getCurrentFontSize()}px '${fontFamily}'`)
+                lineWidth = getTextWidth(part, `${fontStyle} ${fontSize} '${fontFamily}'`)
                 if(lineWidth > maxWidth) break
                 wordCount++
-                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, `normal ${getCurrentFontSize()}px '${fontFamily}'`)
+                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, `normal ${fontSize} '${fontFamily}'`)
             }
             lines.push(words.slice(0, wordCount).join(' '))
             words = words.slice(wordCount)
@@ -84,6 +80,16 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
             const lines = getLines(activeItemIndex, maxWidth)
             setLines(lines)
             setTimeoutElapsed(0)
+        }
+
+        if(titleRef !== null) {
+            const fontSize = window.getComputedStyle(titleRef.current).getPropertyValue('font-size')
+            const fontFamily = window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0].replaceAll(`"`, ``)
+            const fontStyle = window.getComputedStyle(titleRef.current).getPropertyValue('font-style')
+
+            setFontFamily(fontFamily)
+            setFontSize(fontSize)
+            setFontStyle(fontStyle)
         }
 
         initTimeout()
@@ -156,7 +162,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
             <div className="RSS__img RSS__img--next">
                 <img src={nextItem.img} alt={nextItem.title} />
             </div>
-            <div className="RSS__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
+            <div className="RSS__title" ref={titleRef}>
                 {lines.map((line, i) => (
                     <div key={i}>
                         <span>{line}</span>
@@ -170,11 +176,6 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
 
 ReactSurferSlider.defaultProps = {
     items: [],
-    fontFamily: 'Arial',
-    fontSizes: [
-        { minWidth: 0, fontSize: 16 },
-        { minWidth: 480, fontSize: 18 },
-    ],
     captionWidths: [
         { minWidth: 0, captionWidth: 1 },
         { minWidth: 420, captionWidth: .7 }

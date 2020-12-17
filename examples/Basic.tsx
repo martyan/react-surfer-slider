@@ -14,18 +14,6 @@ const Basic: FunctionComponent = () => (
     <div style={{maxWidth: 640}}>
         <SurferSlider
             items={sliderItems}
-            fontFamily="Roboto Slab"
-            fontSizes={[
-                { minWidth: 0, fontSize: 16 },
-                { minWidth: 480, fontSize: 18 },
-                { minWidth: 640, fontSize: 22 },
-                { minWidth: 860, fontSize: 24 }
-            ]}
-            captionWidths={[
-                { minWidth: 0, captionWidth: .7 },
-                { minWidth: 640, captionWidth: .5 },
-                // { minWidth: 420, captionWidth: .9 }
-            ]}
             onClick={(item) => window.open(item.url, '_blank')}
         />
     </div>
