@@ -1,4 +1,4 @@
-import React, {FunctionComponent, ReactNode, useEffect, useState, useRef} from 'react'
+import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef} from 'react'
 import './SurferSlider.scss'
 import classNames from './classNames';
 
