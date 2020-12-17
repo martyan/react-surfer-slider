@@ -1,36 +1,36 @@
-.surfer-slider {
+.RSS {
   position: relative;
   width: 100%;
 
-  &.surfer-slider--mouse-over {
-    .surfer-slider__pagination-item--active span:after {
+  &.RSS--mouse-over {
+    .RSS__pagination-item--active span:after {
       animation-play-state: paused;
     }
-    .surfer-slider__img img {
+    .RSS__img img {
       animation-play-state: paused;
     }
   }
 
-  &.surfer-slider--before-show {
-    .surfer-slider__img:not(.surfer-slider__img--next) img {
+  &.RSS--before-show {
+    .RSS__img:not(.RSS__img--next) img {
       right: 120%;
       transition: 1s ease;
       animation: none;
       transform: scale(1);
     }
 
-    .surfer-slider__pagination-item--active span:after {
+    .RSS__pagination-item--active span:after {
       background: #333;
     }
 
-    .surfer-slider__img--next {
+    .RSS__img--next {
       &:after {
         right: 120%;
         transition: 1s ease;
       }
     }
 
-    .surfer-slider__title {
+    .RSS__title {
       span {
         color: transparent;
         max-width: 1px;
@@ -41,7 +41,7 @@
   }
 }
 
-.surfer-slider__pagination {
+.RSS__pagination {
   position: absolute;
   left: 15px;
   top: 10px;
@@ -51,14 +51,14 @@
   justify-content: flex-end;
 }
 
-.surfer-slider__pagination-item {
+.RSS__pagination-item {
   position: relative;
   flex: 0 1 72px;
   margin-right: 5px;
   padding: 5px 0;
   cursor: pointer;
 
-  &.surfer-slider__pagination-item--active {
+  &.RSS__pagination-item--active {
     @keyframes progress {
       0% { width: 0; }
       100% { width: 100%; }
@@ -91,7 +91,7 @@
   }
 }
 
-.surfer-slider__img {
+.RSS__img {
   position: relative;
   padding-top: calc(100% / 16 * 9);
   overflow: hidden;
@@ -108,7 +108,7 @@
     opacity: .3;
   }
 
-  &.surfer-slider__img--next {
+  &.RSS__img--next {
     position: absolute;
     left: 0;
     top: 0;
@@ -123,7 +123,7 @@
     100% { transform: scale(1) }
   }
 
-  &:not(.surfer-slider__img--next) img {
+  &:not(.RSS__img--next) img {
     animation: zoom 5s forwards linear;
   }
 
@@ -138,7 +138,7 @@
   }
 }
 
-.surfer-slider__title {
+.RSS__title {
   position: absolute;
   bottom: -15px;
   left: 15px;

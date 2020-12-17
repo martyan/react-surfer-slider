@@ -1,6 +1,5 @@
 import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef} from 'react'
-import './SurferSlider.scss'
-import classNames from './classNames';
+import './ReactSurferSlider.scss'
 
 export type ReactSurferSliderItemProps = {
     title: string,
@@ -16,9 +15,12 @@ export type ReactSurferSliderProps = {
     onClick?: (item: ReactSurferSliderItemProps) => void
 }
 
+type ClassNames = Array<string | false>
+const classNames = (classNames: ClassNames): string => classNames.filter(Boolean).join(' ')
+
 function getTextWidth(text: string, fontFamily: string): number {
     // re-use canvas object for better performance
-    let canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'))
+    let canvas = (getTextWidth as any).canvas || ((getTextWidth as any).canvas = document.createElement('canvas'))
     let context = canvas.getContext('2d')
     context.font = fontFamily
     let metrics = context.measureText(text)
@@ -121,7 +123,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
 
     return (
         <div
-            className={classNames(['surfer-slider', isAnimating && 'surfer-slider--before-show', mouseOver && 'surfer-slider--mouse-over'])}
+            className={classNames(['RSS', isAnimating && 'RSS--before-show', mouseOver && 'RSS--mouse-over'])}
             ref={sliderRef}
             onMouseEnter={() => {
                 resetTimeout()
@@ -137,24 +139,24 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
                 onClick?.(activeItem)
             }}
         >
-            <div className="surfer-slider__pagination">
+            <div className="RSS__pagination">
                 {items.map((item, i) => (
                     <div
                         key={i}
-                        className={classNames(['surfer-slider__pagination-item', activeItemIndex === i && 'surfer-slider__pagination-item--active'])}
+                        className={classNames(['RSS__pagination-item', activeItemIndex === i && 'RSS__pagination-item--active'])}
                         onClick={(e) => handlePaginationItemClick(e, i)}
                     >
                         <span></span>
                     </div>
                 ))}
             </div>
-            <div className="surfer-slider__img">
+            <div className="RSS__img">
                 <img src={activeItem.img} alt={activeItem.title} />
             </div>
-            <div className="surfer-slider__img surfer-slider__img--next">
+            <div className="RSS__img RSS__img--next">
                 <img src={nextItem.img} alt={nextItem.title} />
             </div>
-            <div className="surfer-slider__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
+            <div className="RSS__title" style={{fontFamily, fontSize: getCurrentFontSize()}}>
                 {lines.map((line, i) => (
                     <div key={i}>
                         <span>{line}</span>
@@ -167,7 +169,17 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, f
 }
 
 ReactSurferSlider.defaultProps = {
-    items: []
+    items: [],
+    fontFamily: 'Arial',
+    fontSizes: [
+        { minWidth: 0, fontSize: 16 },
+        { minWidth: 480, fontSize: 18 },
+    ],
+    captionWidths: [
+        { minWidth: 0, captionWidth: 1 },
+        { minWidth: 420, captionWidth: .7 }
+    ],
+    onClick: () => null
 }
 
 export default ReactSurferSlider
