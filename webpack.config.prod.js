@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const SRC_PATH = path.resolve(__dirname, 'src');
 const DIST_PATH = path.resolve(__dirname, 'dist');
@@ -51,6 +52,15 @@ module.exports = [
                             '@babel/plugin-proposal-object-rest-spread'
                         ]
                     }
+                },
+                {
+                    test: /\.(scss|css)$/,
+                    loaders: [
+                        MiniCssExtractPlugin.loader,
+                        'css-loader',
+                        'postcss-loader',
+                        'sass-loader',
+                    ]
                 }
             ]
         },
@@ -62,7 +72,10 @@ module.exports = [
                 NODE_ENV: 'production'
             }),
             new CleanWebpackPlugin(DIST_PATH),
-            new webpack.optimize.OccurrenceOrderPlugin()
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new MiniCssExtractPlugin({
+                filename: 'ReactSurferSlider.css',
+            })
         ],
         optimization: {
             minimize: true,
