@@ -1,15 +1,53 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,500');
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap');
+@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
 .examples {
   font-family: 'Roboto Slab', sans-serif;
+  max-width: 640px;
+  margin: 0 auto;
 
-  .RSS {
-    font-size: 16px;
-    line-height: 125%;
+  > div {
+    margin: 50px 0;
+  }
 
-    @media (min-width: 420px) {
-      font-size: 18px;
+  .link {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 7px;
+
+    a {
+      text-decoration: none;
+      text-transform: uppercase;
+      color: #ccc;
+      font-size: .9em;
     }
   }
+
+  .minimal {
+
+    .RSS {
+      font-size: 16px;
+      line-height: 140%;
+
+      @media (min-width: 420px) {
+        font-size: 18px;
+      }
+    }
+
+  }
+
+  .basic {
+
+    .RSS {
+      font-size: 18px;
+      line-height: 120%;
+
+      @media (min-width: 420px) {
+        font-size: 21px;
+        line-height: 140%;
+      }
+    }
+
+  }
+
 }

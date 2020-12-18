@@ -1,6 +1,7 @@
 .RSS {
   position: relative;
   width: 100%;
+  margin-bottom: 15px;
 
   &.RSS--mouse-over {
     .RSS__pagination-item--active .RSS__pagination-progress, .RSS__img img {

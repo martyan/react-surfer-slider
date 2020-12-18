@@ -10,15 +10,11 @@ const sliderItems = [
     {url: 'https://en.wikipedia.org/wiki/Taghazout', title: 'Taghazout is a small fishing village north of the city of Agadir in southwestern Morocco.', img: 'https://firebasestorage.googleapis.com/v0/b/old-felony.appspot.com/o/covers%2Fcover.jpg?alt=media'},
 ]
 
-const Basic: FunctionComponent = () => (
+const Minimal: FunctionComponent = () => (
     <SurferSlider
         items={sliderItems}
         onClick={(item) => window.open(item.url, '_blank')}
-        duration={10000}
-        captionWidths={[
-            {minWidth: 0, captionWidth: 1}
-        ]}
     />
 )
 
-export default Basic
+export default Minimal
