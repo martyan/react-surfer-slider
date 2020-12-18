@@ -73,7 +73,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
     }
 
     useEffect(() => {
-        document.fonts.ready.then(() => {
+        (document as any).fonts.ready.then(() => {
             setFontsInited(true)
         });
     }, [])
@@ -82,7 +82,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
         if(fontsInited) {
             if(titleRef.current !== null && sliderRef.current !== null) {
                 const fontSize = window.getComputedStyle(titleRef.current).getPropertyValue('font-size')
-                const fontFamily = window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0].replaceAll(`"`, ``)
+                const fontFamily = (window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0] as any).replaceAll(`"`, ``)
                 const fontStyle = window.getComputedStyle(titleRef.current).getPropertyValue('font-style')
 
                 const sliderWidth = sliderRef.current!.offsetWidth
