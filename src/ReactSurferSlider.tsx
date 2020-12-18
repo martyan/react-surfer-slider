@@ -9,8 +9,9 @@ export type ReactSurferSliderItemProps = {
 
 export type ReactSurferSliderProps = {
     items: Array<ReactSurferSliderItemProps>,
-    captionWidths: { minWidth: number, captionWidth: number }[],
-    onClick?: (item: ReactSurferSliderItemProps) => void
+    onClick: (item: ReactSurferSliderItemProps) => void,
+    duration: number,
+    captionWidths: { minWidth: number, captionWidth: number }[]
 }
 
 type ClassNames = Array<string | false>
@@ -25,7 +26,7 @@ function getTextWidth(text: string, font: string): number {
     return Math.ceil(metrics.width)
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, captionWidths, onClick }) => {
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, onClick, duration, captionWidths }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
     const titleRef = useRef<HTMLDivElement>(null)
@@ -115,7 +116,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
                 setIsAnimating(false)
                 setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1))
             }, 1000)
-        }, forcedActiveItemIndex !== undefined ? 0 : 5000 - elapsedTime)
+        }, forcedActiveItemIndex !== undefined ? 0 : duration - elapsedTime)
         setTimeoutId(timeout)
     }
 
@@ -142,9 +143,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
                 initTimeout(undefined, timeoutElapsed)
                 setMouseOver(false)
             }}
-            onClick={() => {
-                onClick?.(activeItem)
-            }}
+            onClick={() => onClick(activeItem)}
         >
             <div className="RSS__pagination">
                 {items.map((item, i) => (
@@ -153,12 +152,13 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
                         className={classNames(['RSS__pagination-item', activeItemIndex === i && 'RSS__pagination-item--active'])}
                         onClick={(e) => handlePaginationItemClick(e, i)}
                     >
-                        <span></span>
+                        <span className="RSS__pagination-track"></span>
+                        <span className="RSS__pagination-progress" style={{animationDuration: `${duration}ms`}}></span>
                     </div>
                 ))}
             </div>
             <div className="RSS__img">
-                <img src={activeItem.img} alt={activeItem.title} />
+                <img src={activeItem.img} alt={activeItem.title} style={{animationDuration: `${duration}ms`}} />
             </div>
             <div className="RSS__img RSS__img--next">
                 <img src={nextItem.img} alt={nextItem.title} />
@@ -177,11 +177,12 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
 
 ReactSurferSlider.defaultProps = {
     items: [],
+    duration: 6000,
+    onClick: () => null,
     captionWidths: [
         { minWidth: 0, captionWidth: 1 },
         { minWidth: 420, captionWidth: .7 }
-    ],
-    onClick: () => null
+    ]
 }
 
 export default ReactSurferSlider

@@ -15,6 +15,7 @@ const Basic: FunctionComponent = () => (
         <SurferSlider
             items={sliderItems}
             onClick={(item) => window.open(item.url, '_blank')}
+            duration={10000}
         />
     </div>
 )
