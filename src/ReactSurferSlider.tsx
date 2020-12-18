@@ -16,11 +16,11 @@ export type ReactSurferSliderProps = {
 type ClassNames = Array<string | false>
 const classNames = (classNames: ClassNames): string => classNames.filter(Boolean).join(' ')
 
-function getTextWidth(text: string, fontFamily: string): number {
+function getTextWidth(text: string, font: string): number {
     // re-use canvas object for better performance
     let canvas = (getTextWidth as any).canvas || ((getTextWidth as any).canvas = document.createElement('canvas'))
     let context = canvas.getContext('2d')
-    context.font = fontFamily
+    context.font = font
     let metrics = context.measureText(text)
     return Math.ceil(metrics.width)
 }
@@ -29,6 +29,8 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
 
     const sliderRef = useRef<HTMLDivElement>(null)
     const titleRef = useRef<HTMLDivElement>(null)
+    const [fontsInited, setFontsInited] = useState(false)
+
     const [activeItemIndex, setActiveItemIndex] = useState(0)
     const [lines, setLines] = useState<string[]>([])
     const [isAnimating, setIsAnimating] = useState(false)
@@ -36,10 +38,6 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
     const [timeoutId, setTimeoutId] = useState<number | undefined>()
     const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
     const [timeoutElapsed, setTimeoutElapsed] = useState(0)
-
-    const [fontFamily, setFontFamily] = useState('Arial')
-    const [fontSize, setFontSize] = useState('16px')
-    const [fontStyle, setFontStyle] = useState('normal')
 
     const activeItem = items[activeItemIndex]
 
@@ -50,22 +48,22 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
         return current ? current.captionWidth : captionWidths[0].captionWidth
     }
 
-    const getLines = (activeItemIndex: number, maxWidth: number) => {
-        const activeItem = items[activeItemIndex]
-
+    const getLines = (text: string, font: string, maxWidth: number) => {
         let lines = []
-        let words = activeItem.title.split(' ')
+        let words = text.split(' ')
         while(words.length !== 0) {
             let lineWidth = 0
             let wordCount = 0
+
             while(lineWidth < maxWidth) {
                 if(wordCount + 1 > words.length) break
                 const part = words.slice(0, wordCount + 1).join(' ')
-                lineWidth = getTextWidth(part, `${fontStyle} ${fontSize} '${fontFamily}'`)
+                lineWidth = getTextWidth(part, font)
                 if(lineWidth > maxWidth) break
                 wordCount++
-                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, `normal ${fontSize} '${fontFamily}'`)
+                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, font)
             }
+
             lines.push(words.slice(0, wordCount).join(' '))
             words = words.slice(wordCount)
         }
@@ -74,26 +72,29 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, c
     }
 
     useEffect(() => {
-        if(sliderRef !== null) {
-            const sliderWidth = sliderRef.current!.offsetWidth
-            const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
-            const lines = getLines(activeItemIndex, maxWidth)
-            setLines(lines)
-            setTimeoutElapsed(0)
+        document.fonts.ready.then(() => {
+            setFontsInited(true)
+        });
+    }, [])
+
+    useEffect(() => {
+        if(fontsInited) {
+            if(titleRef.current !== null && sliderRef.current !== null) {
+                const fontSize = window.getComputedStyle(titleRef.current).getPropertyValue('font-size')
+                const fontFamily = window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0].replaceAll(`"`, ``)
+                const fontStyle = window.getComputedStyle(titleRef.current).getPropertyValue('font-style')
+
+                const sliderWidth = sliderRef.current!.offsetWidth
+                const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
+                const lines = getLines(items[activeItemIndex].title, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
+
+                setLines(lines)
+                setTimeoutElapsed(0)
+            }
+
+            initTimeout()
         }
-
-        if(titleRef !== null) {
-            const fontSize = window.getComputedStyle(titleRef.current).getPropertyValue('font-size')
-            const fontFamily = window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0].replaceAll(`"`, ``)
-            const fontStyle = window.getComputedStyle(titleRef.current).getPropertyValue('font-style')
-
-            setFontFamily(fontFamily)
-            setFontSize(fontSize)
-            setFontStyle(fontStyle)
-        }
-
-        initTimeout()
-    }, [activeItemIndex])
+    }, [activeItemIndex, fontsInited])
 
     const resetTimeout = () => {
         if(timeoutId) {
