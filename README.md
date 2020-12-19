@@ -37,6 +37,7 @@ const sliderItems = [
 <SurferSlider
     items={sliderItems}
     duration={5000}
+    onClick={(item) => window.open(item.url, '_blank')}
 />
 ```
 
