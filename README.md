@@ -4,7 +4,7 @@ Photo slider component with animated caption for React
 
 <br />
 <p align="center">
-    <img src="https://martinjuzl.com/react-surfer-slider.gif">
+    <img src="https://martinjuzl.com/react-surfer-slider.gif?v3">
 </p>
 <br />
 
