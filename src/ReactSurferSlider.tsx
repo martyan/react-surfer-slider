@@ -1,7 +1,9 @@
 import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef, ReactNode} from 'react'
 import Slide from './Slide'
+import useSize from './utils/useSize'
+import getTextWidth from './utils/getTextWidth'
+import classNames from './utils/classNames'
 import './ReactSurferSlider.scss'
-import {useSize} from './useSize'
 
 type CaptionWidthsType = {
     minWidth: number,
@@ -16,17 +18,6 @@ export type ReactSurferSliderProps = {
         height: number
     }
 }
-
-function getTextWidth(text: string, font: string): number {
-    // re-use canvas object for better performance
-    let canvas = (getTextWidth as any).canvas || ((getTextWidth as any).canvas = document.createElement('canvas'))
-    let context = canvas.getContext('2d')
-    context.font = font
-    let metrics = context.measureText(text)
-    return Math.ceil(metrics.width)
-}
-
-const classNames = (classNames: Array<string | false>): string => classNames.filter(Boolean).join(' ')
 
 const getLines = (text: string, font: string, maxWidth: number) => {
     let lines = []
