@@ -52,7 +52,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const captionRef = useRef<HTMLDivElement>(null)
     const [fontsInited, setFontsInited] = useState(false)
 
-    const [activeItemIndex, setActiveItemIndex] = useState(0)
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0)
     const [lines, setLines] = useState<string[]>([])
     const [isAnimating, setIsAnimating] = useState(false)
     const [mouseOver, setMouseOver] = useState(false)
@@ -64,7 +64,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const slides = (children as any).filter((child: any) => child.type.name === 'Slide')
     if(slides.length === 0) throw 'Error: You need to pass elements inside Slide component'
 
-    const activeItem = slides[activeItemIndex]
+    const activeSlide = slides[activeSlideIndex]
 
     useEffect(() => {
         (document as any).fonts.ready.then(() => {
@@ -81,7 +81,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
                 const sliderWidth = sliderRef.current!.offsetWidth
                 const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
-                const lines = getLines(slides[activeItemIndex].props.caption, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
+                const lines = getLines(slides[activeSlideIndex].props.caption, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
 
                 setLines(lines)
                 setTimeoutElapsed(0)
@@ -89,7 +89,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
             initTimeout()
         }
-    }, [activeItemIndex, fontsInited])
+    }, [activeSlideIndex, fontsInited])
 
     const getCurrentCaptionWidth = () => {
         if(sliderRef.current === null) return captionWidths[0].captionWidth
@@ -105,7 +105,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
         }
     }
 
-    const initTimeout = (forcedActiveItemIndex?: number, elapsedTime: number = 0) => {
+    const initTimeout = (forcedActiveSlideIndex?: number, elapsedTime: number = 0) => {
         resetTimeout()
 
         setTimeoutTimestamp(new Date().getTime())
@@ -115,20 +115,20 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
             window.setTimeout(() => {
                 setIsAnimating(false)
-                setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === slides.length - 1 ? 0 : activeItemIndex + 1))
+                setActiveSlideIndex(forcedActiveSlideIndex !== undefined ? forcedActiveSlideIndex : (activeSlideIndex === slides.length - 1 ? 0 : activeSlideIndex + 1))
             }, 1000)
-        }, forcedActiveItemIndex !== undefined ? 0 : duration - elapsedTime)
+        }, forcedActiveSlideIndex !== undefined ? 0 : duration - elapsedTime)
         setTimeoutId(timeout)
     }
 
-    const handlePaginationItemClick = (e: MouseEvent, i: number) => {
+    const handlePaginationSlideClick = (e: MouseEvent, i: number) => {
         e.stopPropagation()
 
         initTimeout(i)
     }
 
-    const getNextItem = (activeItemIndex: number) => slides[activeItemIndex === slides.length - 1 ? 0 : activeItemIndex + 1]
-    const nextItem = getNextItem(activeItemIndex)
+    const getNextSlide = (activeSlideIndex: number) => slides[activeSlideIndex === slides.length - 1 ? 0 : activeSlideIndex + 1]
+    const nextSlide = getNextSlide(activeSlideIndex)
 
     return (
         <div
@@ -149,8 +149,8 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
                 {slides.map((slide: ReactNode, i: number) => (
                     <div
                         key={i}
-                        className={classNames(['RSS__pagination-item', activeItemIndex === i && 'RSS__pagination-item--active'])}
-                        onClick={(e) => handlePaginationItemClick(e, i)}
+                        className={classNames(['RSS__pagination-item', activeSlideIndex === i && 'RSS__pagination-item--active'])}
+                        onClick={(e) => handlePaginationSlideClick(e, i)}
                     >
                         <span className="RSS__pagination-track"></span>
                         <span className="RSS__pagination-progress" style={{animationDuration: `${duration}ms`}}></span>
@@ -159,11 +159,11 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
             </div>
 
             <div className="RSS__slide">
-                {activeItem.props.children}
+                {activeSlide.props.children}
             </div>
 
             <div className="RSS__slide RSS__slide--next">
-                {nextItem.props.children}
+                {nextSlide.props.children}
             </div>
 
             <div className="RSS__caption" ref={captionRef}>
