@@ -1,6 +1,7 @@
 import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef, ReactNode} from 'react'
 import Slide from './Slide'
 import './ReactSurferSlider.scss'
+import {useSize} from './useSize'
 
 type CaptionWidthsType = {
     minWidth: number,
@@ -64,6 +65,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const [timeoutId, setTimeoutId] = useState<number | undefined>()
     const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
     const [timeoutElapsed, setTimeoutElapsed] = useState(0)
+    const [sliderWidth] = useSize(sliderRef)
 
     if(!children) throw 'Error: No slides found'
     const slides = (children as any).filter((child: any) => child.type.name === 'Slide')
@@ -81,12 +83,11 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
     useEffect(() => {
         if(fontsInited) {
-            if(captionRef.current !== null && sliderRef.current !== null) {
+            if(captionRef.current !== null && sliderWidth !== 0) {
                 const fontSize = window.getComputedStyle(captionRef.current).getPropertyValue('font-size')
                 const fontFamily = (window.getComputedStyle(captionRef.current).getPropertyValue('font-family').split(',')[0] as any).replaceAll(`"`, ``)
                 const fontStyle = window.getComputedStyle(captionRef.current).getPropertyValue('font-style')
 
-                const sliderWidth = sliderRef.current!.offsetWidth
                 const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
                 const lines = getLines(slides[activeSlideIndex].props.caption, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
 
@@ -96,11 +97,9 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
             initTimeout()
         }
-    }, [activeSlideIndex, fontsInited])
+    }, [activeSlideIndex, fontsInited, sliderWidth])
 
     const getCurrentCaptionWidth = () => {
-        if(sliderRef.current === null) return captionWidths[0].captionWidth
-        const sliderWidth = sliderRef.current!.offsetWidth
         const current = [...captionWidths].reverse().find(size => size.minWidth < sliderWidth)
         return current ? current.captionWidth : captionWidths[0].captionWidth
     }
