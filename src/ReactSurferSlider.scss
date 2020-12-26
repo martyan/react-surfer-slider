@@ -159,7 +159,7 @@
     overflow: hidden;
     max-width: 100%;
     max-height: 100px;
-    transition: 1s cubic-bezier(.4,.55,.56,.4), color .15s ease .3s;
+    transition: max-width 1s cubic-bezier(.4,.55,.56,.4), color .15s ease .3s;
     padding: 4px 8px;
     background: black;
     color: white;
