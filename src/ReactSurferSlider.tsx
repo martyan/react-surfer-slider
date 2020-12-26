@@ -59,8 +59,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const [sliderWidth] = useSize(sliderRef)
 
     if(!children) throw 'Error: No slides found'
-    const slides = (children as any).filter((child: any) => child.type.name === 'Slide')
-    if(slides.length === 0) throw 'Error: You need to pass elements inside Slide component'
+    const slides = (children as any)
     if(slides.length < 2) throw 'Error: You need to have at least 2 slides'
 
     const activeSlide = slides[activeSlideIndex]
