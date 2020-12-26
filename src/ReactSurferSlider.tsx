@@ -10,7 +10,7 @@ type CaptionWidthsType = {
     captionWidth: number
 }[]
 
-export type ReactSurferSliderProps = {
+type ReactSurferSliderProps = {
     duration: number,
     captionWidths: CaptionWidthsType,
     ratio: {
