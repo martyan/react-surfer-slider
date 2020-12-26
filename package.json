@@ -1,6 +1,6 @@
 {
     "name": "react-surfer-slider",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "main": "./dist/ReactSurferSlider.js",
     "types": "./dist/ReactSurferSlider.d.ts",
     "files": [
