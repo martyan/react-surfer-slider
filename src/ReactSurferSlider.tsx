@@ -53,6 +53,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const [fontsInited, setFontsInited] = useState(false)
 
     const [activeSlideIndex, setActiveSlideIndex] = useState(0)
+    const [nextSlideIndex, setNextSlideIndex] = useState(1)
     const [lines, setLines] = useState<string[]>([])
     const [isAnimating, setIsAnimating] = useState(false)
     const [mouseOver, setMouseOver] = useState(false)
@@ -60,11 +61,13 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
     const [timeoutElapsed, setTimeoutElapsed] = useState(0)
 
-    if(!children) throw 'Error: No slides detected'
+    if(!children) throw 'Error: No slides found'
     const slides = (children as any).filter((child: any) => child.type.name === 'Slide')
     if(slides.length === 0) throw 'Error: You need to pass elements inside Slide component'
+    if(slides.length < 2) throw 'Error: You need to have at least 2 slides'
 
     const activeSlide = slides[activeSlideIndex]
+    const nextSlide = slides[nextSlideIndex]
 
     useEffect(() => {
         (document as any).fonts.ready.then(() => {
@@ -98,6 +101,8 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
         return current ? current.captionWidth : captionWidths[0].captionWidth
     }
 
+    const getNextSlideIndex = (index: number) => index >= slides.length - 1 ? 0 : index + 1
+
     const resetTimeout = () => {
         if(timeoutId) {
             window.clearTimeout(timeoutId)
@@ -115,7 +120,8 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
 
             window.setTimeout(() => {
                 setIsAnimating(false)
-                setActiveSlideIndex(forcedActiveSlideIndex !== undefined ? forcedActiveSlideIndex : (activeSlideIndex === slides.length - 1 ? 0 : activeSlideIndex + 1))
+                setActiveSlideIndex(forcedActiveSlideIndex !== undefined ? forcedActiveSlideIndex : getNextSlideIndex(activeSlideIndex))
+                setNextSlideIndex(getNextSlideIndex(activeSlideIndex + 1))
             }, 1000)
         }, forcedActiveSlideIndex !== undefined ? 0 : duration - elapsedTime)
         setTimeoutId(timeout)
@@ -124,11 +130,9 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
     const handlePaginationSlideClick = (e: MouseEvent, i: number) => {
         e.stopPropagation()
 
+        setNextSlideIndex(i)
         initTimeout(i)
     }
-
-    const getNextSlide = (activeSlideIndex: number) => slides[activeSlideIndex === slides.length - 1 ? 0 : activeSlideIndex + 1]
-    const nextSlide = getNextSlide(activeSlideIndex)
 
     return (
         <div
