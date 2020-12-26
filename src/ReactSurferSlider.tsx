@@ -9,7 +9,11 @@ type CaptionWidthsType = {
 
 export type ReactSurferSliderProps = {
     duration: number,
-    captionWidths: CaptionWidthsType
+    captionWidths: CaptionWidthsType,
+    ratio: {
+        width: number,
+        height: number
+    }
 }
 
 function getTextWidth(text: string, font: string): number {
@@ -46,7 +50,7 @@ const getLines = (text: string, font: string, maxWidth: number) => {
     return lines
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration, captionWidths, children }) => {
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration, captionWidths, ratio, children }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
     const captionRef = useRef<HTMLDivElement>(null)
@@ -179,6 +183,9 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration
             </div>
 
             <style>{`
+                .RSS__slide {
+                    padding-top: calc(100% * ${ratio.height} / ${ratio.width});
+                }
                 .RSS__slide img {
                     animation-duration: ${duration}ms;
                 }
@@ -194,7 +201,11 @@ ReactSurferSlider.defaultProps = {
     captionWidths: [
         { minWidth: 0, captionWidth: 1 },
         { minWidth: 420, captionWidth: .7 }
-    ]
+    ],
+    ratio: {
+        width: 16,
+        height: 9
+    }
 }
 
 export default ReactSurferSlider
