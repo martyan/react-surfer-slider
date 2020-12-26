@@ -1,21 +1,16 @@
-import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef} from 'react'
+import React, {FunctionComponent, MouseEvent, useEffect, useState, useRef, ReactNode} from 'react'
+import Slide from './Slide'
 import './ReactSurferSlider.scss'
 
-export type ReactSurferSliderItemProps = {
-    title: string,
-    img: string,
-    url: string
-}
+type CaptionWidthsType = {
+    minWidth: number,
+    captionWidth: number
+}[]
 
 export type ReactSurferSliderProps = {
-    items: Array<ReactSurferSliderItemProps>,
-    onClick: (item: ReactSurferSliderItemProps) => void,
     duration: number,
-    captionWidths: { minWidth: number, captionWidth: number }[]
+    captionWidths: CaptionWidthsType
 }
-
-type ClassNames = Array<string | false>
-const classNames = (classNames: ClassNames): string => classNames.filter(Boolean).join(' ')
 
 function getTextWidth(text: string, font: string): number {
     // re-use canvas object for better performance
@@ -26,10 +21,35 @@ function getTextWidth(text: string, font: string): number {
     return Math.ceil(metrics.width)
 }
 
-const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, onClick, duration, captionWidths }) => {
+const classNames = (classNames: Array<string | false>): string => classNames.filter(Boolean).join(' ')
+
+const getLines = (text: string, font: string, maxWidth: number) => {
+    let lines = []
+    let words = text.split(' ')
+    while(words.length !== 0) {
+        let lineWidth = 0
+        let wordCount = 0
+
+        while(lineWidth < maxWidth) {
+            if(wordCount + 1 > words.length) break
+            const part = words.slice(0, wordCount + 1).join(' ')
+            lineWidth = getTextWidth(part, font)
+            if(lineWidth > maxWidth) break
+            wordCount++
+            // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, font)
+        }
+
+        lines.push(words.slice(0, wordCount).join(' '))
+        words = words.slice(wordCount)
+    }
+
+    return lines
+}
+
+const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ duration, captionWidths, children }) => {
 
     const sliderRef = useRef<HTMLDivElement>(null)
-    const titleRef = useRef<HTMLDivElement>(null)
+    const captionRef = useRef<HTMLDivElement>(null)
     const [fontsInited, setFontsInited] = useState(false)
 
     const [activeItemIndex, setActiveItemIndex] = useState(0)
@@ -40,37 +60,11 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
     const [timeoutTimeStamp, setTimeoutTimestamp] = useState(0)
     const [timeoutElapsed, setTimeoutElapsed] = useState(0)
 
-    const activeItem = items[activeItemIndex]
+    if(!children) throw 'Error: No slides detected'
+    const slides = (children as any).filter((child: any) => child.type.name === 'Slide')
+    if(slides.length === 0) throw 'Error: You need to pass elements inside Slide component'
 
-    const getCurrentCaptionWidth = () => {
-        if(sliderRef.current === null) return captionWidths[0].captionWidth
-        const sliderWidth = sliderRef.current!.offsetWidth
-        const current = [...captionWidths].reverse().find(size => size.minWidth < sliderWidth)
-        return current ? current.captionWidth : captionWidths[0].captionWidth
-    }
-
-    const getLines = (text: string, font: string, maxWidth: number) => {
-        let lines = []
-        let words = text.split(' ')
-        while(words.length !== 0) {
-            let lineWidth = 0
-            let wordCount = 0
-
-            while(lineWidth < maxWidth) {
-                if(wordCount + 1 > words.length) break
-                const part = words.slice(0, wordCount + 1).join(' ')
-                lineWidth = getTextWidth(part, font)
-                if(lineWidth > maxWidth) break
-                wordCount++
-                // console.log(part, getCurrentCaptionWidth(), lineWidth, maxWidth, font)
-            }
-
-            lines.push(words.slice(0, wordCount).join(' '))
-            words = words.slice(wordCount)
-        }
-
-        return lines
-    }
+    const activeItem = slides[activeItemIndex]
 
     useEffect(() => {
         (document as any).fonts.ready.then(() => {
@@ -80,14 +74,14 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
 
     useEffect(() => {
         if(fontsInited) {
-            if(titleRef.current !== null && sliderRef.current !== null) {
-                const fontSize = window.getComputedStyle(titleRef.current).getPropertyValue('font-size')
-                const fontFamily = (window.getComputedStyle(titleRef.current).getPropertyValue('font-family').split(',')[0] as any).replaceAll(`"`, ``)
-                const fontStyle = window.getComputedStyle(titleRef.current).getPropertyValue('font-style')
+            if(captionRef.current !== null && sliderRef.current !== null) {
+                const fontSize = window.getComputedStyle(captionRef.current).getPropertyValue('font-size')
+                const fontFamily = (window.getComputedStyle(captionRef.current).getPropertyValue('font-family').split(',')[0] as any).replaceAll(`"`, ``)
+                const fontStyle = window.getComputedStyle(captionRef.current).getPropertyValue('font-style')
 
                 const sliderWidth = sliderRef.current!.offsetWidth
                 const maxWidth = sliderWidth * getCurrentCaptionWidth() - 44
-                const lines = getLines(items[activeItemIndex].title, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
+                const lines = getLines(slides[activeItemIndex].props.caption, `${fontStyle} ${fontSize} ${fontFamily}`, maxWidth)
 
                 setLines(lines)
                 setTimeoutElapsed(0)
@@ -96,6 +90,13 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
             initTimeout()
         }
     }, [activeItemIndex, fontsInited])
+
+    const getCurrentCaptionWidth = () => {
+        if(sliderRef.current === null) return captionWidths[0].captionWidth
+        const sliderWidth = sliderRef.current!.offsetWidth
+        const current = [...captionWidths].reverse().find(size => size.minWidth < sliderWidth)
+        return current ? current.captionWidth : captionWidths[0].captionWidth
+    }
 
     const resetTimeout = () => {
         if(timeoutId) {
@@ -114,7 +115,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
 
             window.setTimeout(() => {
                 setIsAnimating(false)
-                setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1))
+                setActiveItemIndex(forcedActiveItemIndex !== undefined ? forcedActiveItemIndex : (activeItemIndex === slides.length - 1 ? 0 : activeItemIndex + 1))
             }, 1000)
         }, forcedActiveItemIndex !== undefined ? 0 : duration - elapsedTime)
         setTimeoutId(timeout)
@@ -126,7 +127,7 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
         initTimeout(i)
     }
 
-    const getNextItem = (activeItemIndex: number) => items[activeItemIndex === items.length - 1 ? 0 : activeItemIndex + 1]
+    const getNextItem = (activeItemIndex: number) => slides[activeItemIndex === slides.length - 1 ? 0 : activeItemIndex + 1]
     const nextItem = getNextItem(activeItemIndex)
 
     return (
@@ -143,10 +144,9 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
                 initTimeout(undefined, timeoutElapsed)
                 setMouseOver(false)
             }}
-            onClick={() => onClick(activeItem)}
         >
             <div className="RSS__pagination">
-                {items.map((item, i) => (
+                {slides.map((slide: ReactNode, i: number) => (
                     <div
                         key={i}
                         className={classNames(['RSS__pagination-item', activeItemIndex === i && 'RSS__pagination-item--active'])}
@@ -157,28 +157,36 @@ const ReactSurferSlider: FunctionComponent<ReactSurferSliderProps> = ({ items, o
                     </div>
                 ))}
             </div>
-            <div className="RSS__img">
-                <img src={activeItem.img} alt={activeItem.title} style={{animationDuration: `${duration}ms`}} />
+
+            <div className="RSS__slide">
+                {activeItem.props.children}
             </div>
-            <div className="RSS__img RSS__img--next">
-                <img src={nextItem.img} alt={nextItem.title} />
+
+            <div className="RSS__slide RSS__slide--next">
+                {nextItem.props.children}
             </div>
-            <div className="RSS__title" ref={titleRef}>
+
+            <div className="RSS__caption" ref={captionRef}>
                 {lines.map((line, i) => (
                     <div key={i}>
                         <span>{line}</span>
                     </div>
                 ))}
             </div>
+
+            <style>{`
+                .RSS__slide img {
+                    animation-duration: ${duration}ms;
+                }
+            `}
+            </style>
         </div>
     )
 
 }
 
 ReactSurferSlider.defaultProps = {
-    items: [],
     duration: 6000,
-    onClick: () => null,
     captionWidths: [
         { minWidth: 0, captionWidth: 1 },
         { minWidth: 420, captionWidth: .7 }
@@ -186,3 +194,4 @@ ReactSurferSlider.defaultProps = {
 }
 
 export default ReactSurferSlider
+export { Slide }

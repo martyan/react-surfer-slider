@@ -4,13 +4,13 @@
   margin-bottom: 15px;
 
   &.RSS--mouse-over {
-    .RSS__pagination-item--active .RSS__pagination-progress, .RSS__img img {
+    .RSS__pagination-item--active .RSS__pagination-progress, .RSS__slide img {
       animation-play-state: paused;
     }
   }
 
   &.RSS--before-show {
-    .RSS__img:not(.RSS__img--next) img {
+    .RSS__slide:not(.RSS__slide--next) img {
       right: 120%;
       transition: 1s ease;
       animation: none;
@@ -21,14 +21,14 @@
       background: #333;
     }
 
-    .RSS__img--next {
+    .RSS__slide--next {
       &:after {
         right: 120%;
         transition: 1s ease;
       }
     }
 
-    .RSS__title {
+    .RSS__caption {
       span {
         color: transparent;
         max-width: 1px;
@@ -89,7 +89,7 @@
   }
 }
 
-.RSS__img {
+.RSS__slide {
   position: relative;
   padding-top: calc(100% / 16 * 9);
   overflow: hidden;
@@ -106,7 +106,7 @@
     opacity: .3;
   }
 
-  &.RSS__img--next {
+  &.RSS__slide--next {
     position: absolute;
     left: 0;
     top: 0;
@@ -121,8 +121,10 @@
     100% { transform: scale(1) }
   }
 
-  &:not(.RSS__img--next) img {
-    animation: zoom 5s forwards linear;
+  &:not(.RSS__slide--next) img {
+    animation-name: zoom;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
   }
 
   img {
@@ -136,7 +138,7 @@
   }
 }
 
-.RSS__title {
+.RSS__caption {
   position: absolute;
   bottom: -15px;
   left: 15px;
@@ -168,5 +170,4 @@
       padding: 4px 10px;
     }
   }
-
 }
